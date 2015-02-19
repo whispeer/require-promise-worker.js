@@ -1,0 +1,25 @@
+{
+  "name": "require-promise-worker.js",
+  "version": "0.0.1",
+  "authors": [
+    "Nils Kenneweg <nk@ovt.me>"
+  ],
+  "description": "A worker using require and promises.",
+  "main": "index.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "require",
+    "worker",
+    "promise"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
