@@ -44,7 +44,7 @@ define(["module"], function (module) {
 	}
 
 	var packageUri = removeFileFromPath(module.uri);
-	var baseUri = require.toUrl();
+	var baseUri = require.toUrl("");
 	var requireScript = calculateRequirePath(packageUri);
 	var workerBaseUrl = "";
 
@@ -55,10 +55,10 @@ define(["module"], function (module) {
 	}
 
 
-	var Worker = function (Promise, workerScript, requireScriptOverride) {
+	var PromiseWorker = function (Promise, workerScript, requireScriptOverride) {
 		this._Promise = Promise;
 		this._busy = true;
-		this._worker = new Worker(packageUri + "worker.js");
+		this._worker = new Worker(packageUri + "/worker.js");
 		this._awaitFreeQueue = [];
 		this._awaitResponse = null;
 		this._metaListener = null;
@@ -76,7 +76,7 @@ define(["module"], function (module) {
 		});
 	};
 
-	Worker.prototype._workerMessage = function (event) {
+	PromiseWorker.prototype._workerMessage = function (event) {
 		var data = event.data.data; var type = event.data.type;
 		if (type === "meta" && this._metaListener) {
 			this._metaListener(data);
@@ -88,55 +88,59 @@ define(["module"], function (module) {
 		}
 	};
 
-	Worker.prototype.isBusy = function () {
+	PromiseWorker.prototype._workerError = function () {
+		//TODO
+	};
+
+	PromiseWorker.prototype.isBusy = function () {
 		return this._busy;
 	};
 
-	Worker.prototype.lockFree = function () {
+	PromiseWorker.prototype.lockFree = function () {
 		if (!this._busy) {
 			this._busy = true;
 			return this._Promise.resolve();
 		}
 
 		var that = this;
-
 		return new this._Promise(function (resolve, reject) {
-			this._awaitFreeQueue.push(function () {
+			that._awaitFreeQueue.push(function () {
 				that._busy = true;
 				resolve();
 			});
 		});
 	};
 
-	Worker.prototype.awaitFree = function () {
+	PromiseWorker.prototype.awaitFree = function () {
 		if (!this._busy) {
 			return this._Promise.resolve();
 		}
 
+		var that = this;
 		return new this._Promise(function (resolve, reject) {
-			this._awaitFreeQueue.push(resolve);
+			that._awaitFreeQueue.push(resolve);
 		});
 	};
 
-	Worker.prototype._free = function () {
+	PromiseWorker.prototype._free = function () {
 		this._busy = false;
-		this._awaitFreeQueue.each(function (resolveFreePromise) {
+		this._awaitFreeQueue.forEach(function (resolveFreePromise) {
 			if (!this._busy) {
 				resolveFreePromise();
 			}
 		});
 	};
 
-	Worker.prototype._saveCallbacks = function (resolve, reject) {
+	PromiseWorker.prototype._saveCallbacks = function (resolve, reject) {
 		this._awaitResponse = {
 			resolve: resolve,
 			reject: reject
 		};
 	};
 
-	Worker.prototype.runTask = function (data, metaListener) {
+	PromiseWorker.prototype.runTask = function (data, metaListener) {
 		this._metaListener = metaListener;
-		this.lockFree().bind(this).then(function () {
+		return this.lockFree().bind(this).then(function () {
 			var waitPromise = new Promise(this._saveCallbacks.bind(this));
 			this._worker.postMessage({
 				action: "runTask",
@@ -145,4 +149,6 @@ define(["module"], function (module) {
 			return waitPromise;
 		});
 	};
+
+	return PromiseWorker;
 });
