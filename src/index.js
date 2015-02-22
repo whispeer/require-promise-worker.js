@@ -88,8 +88,11 @@ define(["module"], function (module) {
 		}
 	};
 
-	PromiseWorker.prototype._workerError = function () {
-		//TODO
+	PromiseWorker.prototype._workerError = function (error) {
+		if (this._awaitResponse) {
+			this._awaitResponse.reject(error);
+			this._free();
+		}
 	};
 
 	PromiseWorker.prototype.isBusy = function () {
