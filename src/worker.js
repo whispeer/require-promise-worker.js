@@ -20,16 +20,26 @@ self.onmessage = function (event) {
 			self.postMessage({ type: "setup" });
 		});
 	} else if (action === "runTask") {
-		var result = theHandler(event.data.data, function (metaData) {
-			self.postMessage({
-				type: "meta",
-				data: metaData
+		try {
+			var result = theHandler(event.data.data, function (metaData) {
+				self.postMessage({
+					type: "meta",
+					data: metaData
+				});
 			});
-		});
-		self.postMessage({
-			type: "resultTask",
-			data: result
-		});
+			self.postMessage({
+				type: "resultTask",
+				data: result
+			});
+		} catch (e) {
+			self.postMessage({
+				type: "error",
+				data: {
+					message: e.message,
+					stack: e.stack
+				}
+			});
+		}
 	}
 
 
