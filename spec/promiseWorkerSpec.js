@@ -78,5 +78,17 @@ define(["src/index", "bower_components/bluebird/js/browser/bluebird"], function(
             });
 
         });
+
+        it('doesnt run worker registered via runiffree if not free', function (done) {
+            myWorker.runTask(100).then(function (result) {
+                expect(result).toBe(1);
+                myWorker.runIfFree(100).then(function (result) {
+                    expect(result).toBe(1);
+                    done();
+                });
+            });
+
+            expect(myWorker.runIfFree(100)).toEqual(false);
+        });
     });
 });
