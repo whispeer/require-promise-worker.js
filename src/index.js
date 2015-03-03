@@ -48,12 +48,11 @@ define(["module"], function (module) {
 	var requireScript = calculateRequirePath(packageUri);
 	var workerBaseUrl = "";
 
-	if (isAbsolute(packageUri)) {
-		workerBaseUrl = packageUri;
+	if (isAbsolute(baseUri)) {
+		workerBaseUrl = baseUri;
 	} else {
 		workerBaseUrl = pathToBack(packageUri) + baseUri;
 	}
-
 
 	var PromiseWorker = function (Promise, workerScript, requireScriptOverride) {
 		this._Promise = Promise;

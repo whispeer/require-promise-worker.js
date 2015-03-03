@@ -2,7 +2,7 @@ define(["src/index", "bower_components/bluebird/js/browser/bluebird"], function(
     describe('worker tests', function() {
         var myWorker;
         beforeEach(function () {
-            myWorker = new PromiseWorker(bluebird, "../spec/testWorker", "../bower_components/requirejs/require.js");
+            myWorker = new PromiseWorker(bluebird, "spec/testWorker", "../bower_components/requirejs/require.js");
         });
 
         it('worker runs task and returns results as promise', function(done) {
@@ -26,7 +26,7 @@ define(["src/index", "bower_components/bluebird/js/browser/bluebird"], function(
     describe('test waiting features and exclusivity', function() {
         var myWorker;
         beforeEach(function () {
-            myWorker = new PromiseWorker(bluebird, "../spec/timedWorker", "../bower_components/requirejs/require.js");
+            myWorker = new PromiseWorker(bluebird, "spec/timedWorker", "../bower_components/requirejs/require.js");
         });
 
         it('worker exclusively runs one task at once', function(done) {
