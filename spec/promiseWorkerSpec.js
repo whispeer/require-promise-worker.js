@@ -91,4 +91,22 @@ define(["src/index", "bower_components/bluebird/js/browser/bluebird"], function(
             expect(myWorker.runIfFree(100)).toEqual(false);
         });
     });
+
+    describe('meta listener', function () {
+        it('calls meta listeners with progress', function (done) {
+            var finished = 0, timeoutLength = 500, cb = jasmine.createSpy('callback');
+            var myWorker = new PromiseWorker(bluebird, "spec/timedWorker", "../bower_components/requirejs/require.js");
+            myWorker.runTask(timeoutLength, cb).then(function (result) {
+                expect(cb).toHaveBeenCalled();
+                var previous = 0;
+                cb.calls.allArgs().forEach(function (e) {
+                    expect(e).toBeLessThan(500);
+                    expect(e-previous).toBeLessThan(11);
+                    previous = e;
+                });
+                expect(result).toBe(1);
+                done();
+            });
+        });
+    });
 });
