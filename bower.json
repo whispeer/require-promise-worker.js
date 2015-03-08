@@ -1,6 +1,6 @@
 {
   "name": "require-promise-worker.js",
-  "version": "0.0.1",
+  "version": "0.1.2",
   "authors": [
     "Nils Kenneweg <nk@ovt.me>"
   ],
