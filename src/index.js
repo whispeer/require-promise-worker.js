@@ -10,49 +10,35 @@
 // ../../../../assets/bower/require.js
 
 define(["module"], function (module) {
+	"use strict";
 	function removeFileFromPath(path) {
 		return path.replace(/\/[^\/]*$/g, "");
 	}
 
-	function isAbsolute(path) {
-		return path.indexOf("/") === 0 || path.indexOf("://") > -1;
-	}
-
-	function pathToBack(path) {
-		return path.replace(/\/[^\/]+\//g, "/../").replace(/^.+\//, "../").replace(/\/.+$/, "/..");
-	}
-
-	function calculateRequirePath(packageUri) {
-		if (isAbsolute(packageUri)) {
-			return;
-		}
-
+	function calculateRequirePath() {
 		var requireScripts = Array.prototype.slice.call(document.getElementsByTagName("script"))
 									.map(function (e) { return e.src; })
-									.filter(function (e) { return e.indexOf("require") > -1; });
+									.filter(function (e) { return e.indexOf("require.js") > -1 || e.indexOf("requirejs") > -1; });
 
 		if (requireScripts.length !== 1) {
 			return;
 		}
 
-		if (isAbsolute(requireScripts[0])) {
-			requireScript = requireScripts[0];
-		} else {
-			requireScripts = pathToBack(packageUri) + requireScripts[0];
-		}
+		return requireScripts[0];
+	}
 
+	function getBaseTag() {
+		var base = document.getElementsByTagName("base")[0];
+		if (base) {
+			return base.href;
+		} else {
+			return "";
+		}
 	}
 
 	var packageUri = removeFileFromPath(module.uri);
-	var baseUri = require.toUrl("");
-	var requireScript = calculateRequirePath(packageUri);
-	var workerBaseUrl = "";
-
-	if (isAbsolute(baseUri)) {
-		workerBaseUrl = baseUri;
-	} else {
-		workerBaseUrl = pathToBack(packageUri) + baseUri;
-	}
+	var requireScript = calculateRequirePath();
+	var workerBaseUrl = getBaseTag() + require.toUrl("");
 
 	var PromiseWorker = function (Promise, workerScript, requireScriptOverride) {
 		this._Promise = Promise;
