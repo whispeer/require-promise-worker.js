@@ -36,7 +36,7 @@ define(["module"], function (module) {
 		}
 	}
 
-	var packageUri = removeFileFromPath(module.uri);
+	var packageUri = removeFileFromPath(require.toUrl(module.id));
 	var requireScript = calculateRequirePath();
 	var workerBaseUrl = getBaseTag() + require.toUrl("");
 
