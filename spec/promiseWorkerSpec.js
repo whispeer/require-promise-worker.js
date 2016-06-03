@@ -62,7 +62,7 @@ define(["src/index", "bower_components/bluebird/js/browser/bluebird"], function(
             });
         });
 
-        /*it('worker doesnt call listeners if busy again', function(done) {
+        it('worker doesnt call listeners if busy again', function(done) {
             var previousCalled = false;
 
             myWorker.runTask(100).then(function (result) {
@@ -81,7 +81,7 @@ define(["src/index", "bower_components/bluebird/js/browser/bluebird"], function(
                 done();
             });
 
-        });*/
+        });
     });
 
     describe('meta listener', function () {
@@ -92,7 +92,7 @@ define(["src/index", "bower_components/bluebird/js/browser/bluebird"], function(
                 expect(cb).toHaveBeenCalled();
                 var previous = 0;
                 cb.calls.allArgs().forEach(function (e) {
-                    expect(e[0]).toBeLessThan(500);
+                    expect(e[0]).toBeLessThan(501);
                     expect(e[0]-previous).toBeLessThan(11);
                     previous = e;
                 });
