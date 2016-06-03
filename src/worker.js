@@ -8,7 +8,9 @@ self.onmessage = function (event) {
 	var action = event.data.action;
 	var data = event.data.data;
 	if (action == "setup") {
-		importScripts(data.requireScript);
+		if (typeof requirejs === "undefined") {
+			importScripts(data.requireScript);
+		}
 
 		requirejs.config({
 			baseUrl: data.workerBaseUrl
