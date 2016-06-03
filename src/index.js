@@ -158,5 +158,58 @@ define(["module"], function (module) {
 		return this._lockFree().then(this._run.bind(this, data, metaListener));
 	};
 
-	return PromiseWorker;
+
+	var FakePromiseWorker = function (Promise, workerScript) {
+		var that = this;
+
+		this._Promise = Promise;
+		this._setupPromise = new Promise(function (setupDone) {
+			require([workerScript], function (workerScript) {
+				that._handler = workerScript;
+				setupDone();
+			});
+		});
+
+		this._freeListener = [];
+	};
+
+	FakePromiseWorker.prototype.isBusy = function () {
+		return false;
+	};
+
+	FakePromiseWorker.prototype.runIfFree = function (data, metaListener) {
+		return this._run(data, metaListener);
+	};
+
+	FakePromiseWorker.prototype.onFree = function (cb) {
+		this._freeListener.push(cb);
+	};
+
+	FakePromiseWorker.prototype._checkQueues = function () {
+		this._freeListener.forEach(function (listener) {
+			try {
+				listener();
+			} catch (e) {}
+		});
+	};
+
+	FakePromiseWorker.prototype._run = function (data, metaListener) {
+		return this._setupPromise.bind(this).then(function () {
+			var result = this._handler(data, function (metaData) {
+				if (typeof metaListener === "function") {
+					metaListener(metaData);
+				}
+			});
+
+			window.setTimeout(this._checkQueues(), 100);
+
+			return result;
+		});
+	};
+
+	FakePromiseWorker.prototype.runTask = function (data, metaListener) {
+		return this._run(data, metaListener);
+	};
+
+	return FakePromiseWorker;
 });
